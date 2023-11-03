@@ -160,7 +160,7 @@ def open_window():
 
                     output_datetime = Label(window, text= f"{words[5]} {words[6]}",
                                              font=("Arial", 14), anchor=NW, bg="#D9D9D9")
-                    output_datetime.place(x=243,y=400,height=35,width=180)
+                    output_datetime.place(x=243,y=400,height=35,width=180)jqwjn
 
                     def clear_screen():
                         output_bericht.config(text="")
