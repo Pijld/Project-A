@@ -1,6 +1,7 @@
 import datetime
 from tkinter import *
 
+"""aanmaken van window en hier te widgets in toevoegen. screenshot van figma gebruikt als achtergrond op canvas."""
 
 window = Tk()
 window.title('voer uw bericht in')
@@ -40,6 +41,8 @@ warning_message = Label(window, text="", font=("Arial", 10), bg="#FFC917", fg="r
 warning_message.place(x=152, y=443, height=15, width=441)
 
 
+"""anoniemfunctie aangemaakt met checkbutton. x gebruikt intvar om status van checkbutton te controleren. als waarde
+van x 1 is, word naam vak leeggemaakt later in een aparte functie gezet, als textvak leeg is, wordt naam 'anoniem'"""
 
 def anoniemfunction():
     if(x.get()==1):
@@ -47,13 +50,17 @@ def anoniemfunction():
         entry_naam.config(state=DISABLED)
     elif(x.get()==0):
         entry_naam.config(state=NORMAL)
-x = IntVar()
 
-checkbutton=Checkbutton(window,text="Anoniem", font=("Open Sans",13,"bold"),height=2,width=15,
+
+x = IntVar()
+checkbutton = Checkbutton(window,text="Anoniem", font=("Open Sans",13,"bold"),height=2,width=15,
                         bg="#0063D3", fg="black", selectcolor="white", activebackground="#0063D3",
                         activeforeground="black", variable=x, onvalue=1, offvalue=0, command=anoniemfunction)
 checkbutton.place(x=700,y=171)
 
+"""Gebruik de datetime import om de huidige datum en tijd te bepalen om in textfile te zetten. 
+bericht dat in textfile gezet wordt uit messagebox gehaald. Er wordt gecontroleerd of lengte van bericht voldoet aan
+eisen, anders krijgt gebruiker een waarschuwingsbericht. Functie wordt in button gezet."""
 
 def verstuur_message():
     current_time = datetime.datetime.now()
@@ -84,3 +91,12 @@ verstuur_button = Button(window,text="Verstuur", font=("Open Sans",13,"bold"),
 verstuur_button.place(x=700,y=320, height=70, width=179.5)
 
 window.mainloop()
+
+
+"""
+Bronnen mod1:
+https://www.youtube.com/watch?v=M2NzvnfS-hI : connect met postgresql via python
+https://www.figma.com/ : bouwen van een basis voor tkinter
+https://www.youtube.com/watch?v=TuLxsvK4svQ : tkinter tutorial
+https://www.ns.nl/platform/fundamentals/colours.html : kleurencode
+"""

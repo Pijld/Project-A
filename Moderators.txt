@@ -1,4 +1,0 @@
-Jan Versteeg;Janversteeg@moderator.com;appelboom123;1
-Henk de Jong;HenkdeJong@moderator.com;perenboom123;2
-Pam de Haan;PamdeHaan@moderator.com;bananenboom123;3
-Youri Lang;YouriLang@moderator.com;kersenboom123;4

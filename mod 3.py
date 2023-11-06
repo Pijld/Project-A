@@ -19,74 +19,78 @@ canvas.create_image(0, 0, image=background, anchor=NW)
 conn = psycopg2.connect(host="20.229.131.82", dbname="project DP", user="postgres", password="postgres")
 cur = conn.cursor()
 
+"""berichten, namen en station_services worden uit database gelezen. berichten en namen worden van nieuwste 
+naar oudste geselecteerd, waar het bericht goedgekeurd is. station met services wordt willekeurig uitgekozen."""
+
+
 cur.execute("SELECT * from station_service")
 station_service = cur.fetchall()
 random_station = random.choice(station_service)
 
-cur.execute("SELECT bericht FROM berichten ORDER BY id DESC limit 1")
+cur.execute("SELECT bericht FROM berichten WHERE status = 'goedgekeurd' ORDER BY id DESC limit 1")
 res1 = cur.fetchone()
 if res1 is not None:
     message1 = res1[0]
 else:
     message1=""
 
-cur.execute("SELECT bericht FROM berichten ORDER BY id DESC limit 1 OFFSET 1")
+cur.execute("SELECT bericht FROM berichten WHERE status = 'goedgekeurd' ORDER BY id DESC limit 1 OFFSET 1")
 res2 = cur.fetchone()
 if res2 is not None:
     message2 = res2[0]
 else:
     message2=""
 
-cur.execute("SELECT bericht FROM berichten ORDER BY id DESC limit 1 OFFSET 2")
+cur.execute("SELECT bericht FROM berichten WHERE status = 'goedgekeurd' ORDER BY id DESC limit 1 OFFSET 2")
 res3 = cur.fetchone()
 if res3 is not None:
     message3 = res3[0]
 else:
     message3=""
 
-cur.execute("SELECT bericht FROM berichten ORDER BY id DESC limit 1 OFFSET 3")
+cur.execute("SELECT bericht FROM berichten WHERE status = 'goedgekeurd' ORDER BY id DESC limit 1 OFFSET 3")
 res4 = cur.fetchone()
 if res4 is not None:
     message4 = res4[0]
 else:
     message4=""
 
-cur.execute("SELECT bericht FROM berichten ORDER BY id DESC limit 1 OFFSET 4")
+cur.execute("SELECT bericht FROM berichten WHERE status = 'goedgekeurd' ORDER BY id DESC limit 1 OFFSET 4")
 res5 = cur.fetchone()
 if res5 is not None:
     message5 = res5[0]
 else:
     message5=""
 
-cur.execute("SELECT naam FROM berichten ORDER BY id DESC limit 1 OFFSET 4")
+cur.execute("SELECT naam FROM berichten WHERE status = 'goedgekeurd' ORDER BY id DESC limit 1 OFFSET 4")
 n5 = cur.fetchone()
 if n5 is not None:
     textnaam5 = n5[0] + " zegt: "
 else:
     textnaam5=""
 
-cur.execute("SELECT naam FROM berichten ORDER BY id DESC limit 1 OFFSET 3")
+cur.execute("SELECT naam FROM berichten WHERE status = 'goedgekeurd' ORDER BY id DESC limit 1 OFFSET 3")
 n4 = cur.fetchone()
 if n4 is not None:
     textnaam4 = n4[0] + " zegt: "
 else:
     textnaam4=""
 
-cur.execute("SELECT naam FROM berichten ORDER BY id DESC limit 1 OFFSET 2")
+cur.execute("SELECT naam FROM berichten WHERE status = 'goedgekeurd' ORDER BY id DESC limit 1 OFFSET 2")
 n3 = cur.fetchone()
 if n3 is not None:
     textnaam3 = n3[0] + " zegt: "
 else:
     textnaam3=""
 
-cur.execute("SELECT naam FROM berichten ORDER BY id DESC limit 1 OFFSET 1")
+cur.execute("SELECT naam FROM berichten WHERE status = 'goedgekeurd' ORDER BY id DESC limit 1 OFFSET 1")
 n2 = cur.fetchone()
 if n2 is not None:
     textnaam2 = n2[0] + " zegt: "
 else:
     textnaam2=""
 
-cur.execute("SELECT naam FROM berichten ORDER BY id DESC limit 1")
+cur.execute("SELECT naam FROM berichten WHERE status = 'goedgekeurd' ORDER BY id DESC limit 1")
 n1 = cur.fetchone()
 if n1 is not None:
     textnaam1 = n1[0] + " zegt: "
@@ -176,6 +180,10 @@ conn.commit()
 cur.close()
 conn.close()
 
+"""API output wordt in json format gezet. Benodigde informatie wordt hiet uit gelezen volgens dictionary methode.
+alles wordt vervolgens in widgets gezet."""
+
+
 BASE_URL = "http://api.openweathermap.org/data/2.5/weather?"
 API_KEY = "32e968cba5609635f6b394a9b4b4b3ea"
 CITY = random_station[0]
@@ -212,8 +220,18 @@ feels_like_label = Label(window, text=f"Voelt als: ℃{str(feels_like)}", font=(
 feels_like_label.place(x=671, y=332, width=213, height=36)
 
 
-
-
-
 window.mainloop()
 
+
+"""
+bronnen mod3:
+https://www.youtube.com/watch?v=7JoMTQgdxg0 : how to build a weather app using api
+https://openweathermap.org/ : openweathermap api
+https://openweathermap.org/weather-conditions#Weather-Condition-Codes-2 : icons van openweathermap.
+https://www.figma.com/ : bouwen van een basis voor tkinter
+https://www.youtube.com/watch?v=M2NzvnfS-hI : connect met postgresql via python
+https://www.youtube.com/watch?v=TuLxsvK4svQ : tkinter tutorial
+https://www.ns.nl/producten/meest-gekocht/p/enkele-reis : achtergrondimage
+https://www.ns.nl/platform/fundamentals/colours.html : kleurencode
+CHAT GPT : lijn 37, ORDER BY id DESC limit 1 OFFSET 1. input "how to select the second to last row of a column sql"
+"""

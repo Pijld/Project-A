@@ -2,6 +2,10 @@ from tkinter import *
 import psycopg2
 import random
 
+"""window wordt aangemaakt. achtergrond is een screenshot van figma. achtergrond wordt in lijst gezet vanwege
+het openen van een aparte acchtergrond met nieuwe widgets. Dit werkt niet als je achtergrondimage niet in een
+lijst zet."""
+
 window = Tk()
 window.geometry("642x400")
 window.resizable(False, False)
@@ -35,12 +39,18 @@ wachtwoord_input.place(x=210, y=270, height=25, width=410)
 foutmelding_text = Label(window, text="", font=("Arial, 10"), bg="#FFC917", fg="red")
 foutmelding_text.place(x=210,y=300,height=20,width=400)
 
+"""korte functie voor het lezen van de lijn. Vervolgens alles splitten om gemakkelijk tot de waardes
+te kunnen komen."""
+
+
 def read_message():
     with (open("output.txt", "r") as f):
-        lines = f.readlines()
-        line = lines[-1] if lines else None
+        line = f.readline()
         words = line.split(";")
         return words
+
+
+"""Kiezen van willekeurig station van de lijst met aangeboden stations."""
 
 
 def kies_station():
@@ -50,66 +60,69 @@ def kies_station():
         return random_station
 
 
-# def mod():
-#     moderator = email_input.get(1.0, 'end-1c')
-#     with open("Moderators.txt", "r") as f:
-#         for line in f:
-#             words = line.split(";")
-#             if str(words[1]).strip() == str(moderator):
-#                 mod_id = words[3]
-#                 return mod_id
+"""twee aparte functies voor het goedkeuren en afkeuren van berichten. Enige verschil is het bericht 'goedkeuren'
+of 'afkeuren'. waardes uit bovenstaande functies worden opgenomen met id van moderator die inlogt om window te openen.
+alle waardes worden naar berichten table in postgres geschreven. f.write wordt gebruikt om textfile leeg te halen."""
+
 
 def goedkeuren():
-    with open("output.txt", "r+") as f:
-        conn = psycopg2.connect(host="20.229.131.82", dbname="project DP", user="postgres", password="postgres")
-        cur = conn.cursor()
-        lines = f.readlines()
-        lines[-1] += "goedgekeurd\n"
-        f.seek(0)
-        mod_id = None
-        f.writelines(lines)
-        gekozen_station = kies_station()
-        lijn = read_message()
-        insert_table = """INSERT INTO berichten(naam, bericht, station, datum, tijd, status, moderator) 
-        VALUES(%s, %s, %s, %s, %s, %s, %s)"""
-        insert_value = (lijn[1], lijn[3], gekozen_station, lijn[5], lijn[6], "goedgekeurd", mod_id)
-        cur.execute(insert_table, insert_value)
+    conn = psycopg2.connect(host="20.229.131.82", dbname="project DP", user="postgres", password="postgres")
+    cur = conn.cursor()
+    gekozen_station = kies_station()
+    lijn = read_message()
+    insert_table = """INSERT INTO berichten(naam, bericht, station, datum, tijd, status, moderator) 
+    VALUES(%s, %s, %s, %s, %s, %s, %s)"""
+    insert_value = (lijn[1], lijn[3], gekozen_station, lijn[5], lijn[6], "goedgekeurd", lijn[7])
+    cur.execute(insert_table, insert_value)
+    conn.commit()
+    cur.close()
+    conn.close()
 
-        conn.commit()
-        cur.close()
-        conn.close()
+    with open("output.txt", "w") as f:
+        f.write("")
+
 
 def afkeuren():
-    with open("output.txt", "r+") as f:
-        conn = psycopg2.connect(host="20.229.131.82", dbname="project DP", user="postgres", password="postgres")
-        cur = conn.cursor()
-        lines = f.readlines()
-        lines[-1] += "afgekeurd\n"
-        f.seek(0)
-        mod_id = None
-        f.writelines(lines)
-        f.truncate()
-        gekozen_station = kies_station()
-        lijn = read_message()
-        insert_table = """INSERT INTO berichten(naam, bericht, station, datum, tijd, status, moderator) 
-        VALUES(%s, %s, %s, %s, %s, %s, %s)"""
-        insert_value = (lijn[1], lijn[3], gekozen_station, lijn[5], lijn[6], "afgekeurd", mod_id)
-        cur.execute(insert_table, insert_value)
+    conn = psycopg2.connect(host="20.229.131.82", dbname="project DP", user="postgres", password="postgres")
+    cur = conn.cursor()
+    gekozen_station = kies_station()
+    lijn = read_message()
+    insert_table = """INSERT INTO berichten(naam, bericht, station, datum, tijd, status, moderator) 
+    VALUES(%s, %s, %s, %s, %s, %s, %s)"""
+    insert_value = (lijn[1], lijn[3], gekozen_station, lijn[5], lijn[6], "afgekeurd", lijn[7])
+    cur.execute(insert_table, insert_value)
+    conn.commit()
+    cur.close()
+    conn.close()
 
-        conn.commit()
-        cur.close()
-        conn.close()
+    with open("output.txt", "w") as f:
+        f.write("")
 
 
+"""email van moderator wordt opgehaald, hier wordt later het mod id ook opgehaald. als email en wachtwoord kloppen
+volgens database, wordt mod_id naar lijn geschreven. Vervolgens worden alle widgets van het window verwijderd en
+vervangen door nieuwe widgets. Later in de functie wordt x variabele aangemaakt om button te disablen als er geen
+beschikbare berichten zijn. met clear_screen wordt het bericht van het scherm gehaald als dit beoordeeld is."""
 
 
 def open_window():
     email = email_input.get(1.0, "end-1c")
     wachtwoord = wachtwoord_input.get()
-    with open("moderators.txt", "r") as f:
-        for line in f:
-            words = line.strip().split(";")
-            if words[1].strip() == email and words[2].strip() == wachtwoord:
+    conn = psycopg2.connect(host="20.229.131.82", dbname="project DP", user="postgres", password="postgres")
+    cur = conn.cursor()
+    cur.execute("SELECT * from moderators")
+    info = cur.fetchall()
+    for i in info:
+        if i[2] == email:
+            mod_id = i[0]
+            with open("output.txt", "r+") as f:
+                lines = f.readlines()
+                lines[-1] += str(mod_id) + ";"
+                f.seek(0)
+                f.writelines(lines)
+                f.truncate()
+        for y in info:
+            if y[2] == email and y[3] == wachtwoord:
                 for widget in window.winfo_children():
                     if widget != foutmelding_text:
                         widget.destroy()
@@ -134,12 +147,10 @@ def open_window():
 
 
                 with open("output.txt", "r") as file:
-                    lines = file.readlines()
-                    last_line = lines[-1]
-                    words = last_line.split(";")
+                    line = file.readline()
+                    words = line.split(";")
                     x = False
-                    print(words[7])
-                    if words[7].strip() != "afgekeurd" and words[7].strip() != "goedgekeurd":
+                    if line != "":
                         output_bericht = Label(window, text=words[3], bg="#D9D9D9",
                                                font=("Arial", 14), anchor=NW, wraplength=500,
                                                justify="left")
@@ -160,7 +171,7 @@ def open_window():
 
                     output_datetime = Label(window, text= f"{words[5]} {words[6]}",
                                              font=("Arial", 14), anchor=NW, bg="#D9D9D9")
-                    output_datetime.place(x=243,y=400,height=35,width=180)jqwjn
+                    output_datetime.place(x=243,y=400,height=35,width=180)
 
                     def clear_screen():
                         output_bericht.config(text="")
@@ -187,12 +198,24 @@ def open_window():
                         approve_button.config(state=DISABLED)
 
 
+def loginknop():
+    open_window()
+
+
 login_button = Button(window,text="Log in", font=("Open Sans", 16, "bold"), bg="#0063D3", fg="white",
-                      activebackground="#0063D3", activeforeground="white",command=open_window)
+                      activebackground="#0063D3", activeforeground="white",command=loginknop)
 login_button.place(x=332,y=350, height=40,width=200)
 
 
 window.mainloop()
 
 
-#bron end-1c chat gpt. betekent, end -1 character, om nieuwe line weg te halen.
+"""
+bronnen mod2: 
+https://www.youtube.com/watch?v=M2NzvnfS-hI : connect met postgresql via python
+https://www.figma.com/ : bouwen van een basis voor tkinter
+https://www.youtube.com/watch?v=TuLxsvK4svQ : tkinter tutorial
+https://www.ns.nl/platform/fundamentals/colours.html : kleurencode
+hulp in klas : lijn 19-21. Hoe de background image te laten werken na alle widgets verwijderd te hebben.
+"""
+

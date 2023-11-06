@@ -1,6 +1,0 @@
-name ;Anoniem; message ;ik doe een test.; datetime ;2023-11-03;21:57;goedgekeurd
-name ;Anoniem; message ;ik doe een tweede test; datetime ;2023-11-03;21:58;afgekeurd
-name ;Anoniem; message ;een derde testje; datetime ;2023-11-05;15:04;afgekeurd
-name ;dannypenny; message ;hallo; datetime ;2023-11-05;23:42;goedgekeurd
-name ;Anoniem; message ;ewa g; datetime ;2023-11-06;13:22;goedgekeurd
-name ;Anoniem; message ;ewa Marcie; datetime ;2023-11-06;13:31;goedgekeurd
